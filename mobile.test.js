@@ -1,30 +1,58 @@
-describe('Native App Automation', () => {
-    it('should login using biometric fingerprint', async () => {
-        const fingerprintButton = await $('~fingerprintLoginButton');
-        await fingerprintButton.waitForDisplayed();
+from appium import webdriver
+from time import sleep
+from extentreports import ExtentTest as ext, ExtentReports as extr
 
-        await driver.fingerPrint(1);
+ext = extr("test-report.html")
+test = ext.create_test("MyTest", "Description of my test")
 
-        const loggedInMessage = await $('~successMessage');
-        await expect(loggedInMessage).toBeDisplayed();
-    });
+# Set up desired capabilities
+desired_caps = {
+    'platformName': 'Android',
+    'platformVersion': 'YOUR_ANDROID_VERSION',
+    'deviceName': 'emulator-5554', 
+    'appPackage': 'com.wdiodemoapp',
+    'appActivity': 'com.wdiodemoapp.MainActivity', 
+    'noReset': True                              
+}
 
-    it('should navigate and fill the form', async () => {
-        const formNavButton = await $('~formTabButton');
-        await formNavButton.click();
+# Initialize the driver
+driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
 
-        const nameField = await $('~nameField');
-        const emailField = await $('~emailField');
-        const phoneField = await $('~phoneField');
-        const submitButton = await $('~submitButton');
+# Wait for a few seconds to let the app launch
+sleep(10)
 
-        await nameField.setValue('John Doe');
-        await emailField.setValue('john.doe@example.com');
-        await phoneField.setValue('1234567890');
+login_button = driver.find_element(AppiumBy.ID, 'com.example.myapp:id/login_button')
+login_button.click()
+test.log(ExtentTest.INFO, "Clicked on login button")
 
-        await submitButton.click();
+login_button = driver.find_element(AppiumBy.ID, 'com.example.myapp:id/biometric')
+login_button.click()
 
-        const successMessage = await $('~successMessage');
-        await expect(successMessage).toBeDisplayed();
-    });
-});
+test.log(ExtentTest.INFO, "Clicked on biometric authentication button")
+
+
+driver.execute_script('mobile: fingerprint', {'fingerprintId': 1})
+
+test.log(ExtentTest.INFO, "Biometric authentication successful")
+
+login_button = driver.find_element(AppiumBy.ID, 'com.example.myapp:id/forms')
+login_button.click()
+
+login_button = driver.find_element(AppiumBy.ID, 'com.example.myapp:id/input').sendKeys("Abc")
+
+test.log(ExtentTest.INFO, "Entered Abc in the input field")
+
+dropdown = driver.find_element(AppiumBy.ID, 'com.example.myapp:id/dropdown')
+dropdown.click()
+
+test.log(ExtentTest.INFO, "Clicked on the dropdown menu")
+
+sleep(2)
+
+option_to_select = driver.find_element(AppiumBy.XPATH, "//android.widget.TextView[@text='webdriver.io.is.awesome']")
+option_to_select.click()
+
+test.log(ExtentTest.INFO, "webdriver.io.is.awesome")
+
+ext.flush()
+driver.quit()
