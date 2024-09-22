@@ -8,7 +8,7 @@ test = ext.create_test("MyTest", "Description of my test")
 # Set up desired capabilities
 desired_caps = {
     'platformName': 'Android',
-    'platformVersion': 'YOUR_ANDROID_VERSION',
+    'platformVersion': '13.0',
     'deviceName': 'emulator-5554', 
     'appPackage': 'com.wdiodemoapp',
     'appActivity': 'com.wdiodemoapp.MainActivity', 
